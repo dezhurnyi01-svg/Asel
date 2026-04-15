@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Әлемі: Интерактивті Оқулық</title>
+    <style>
+        :root {
+            --primary: #217346; /* Excel жасыл түсі */
+            --secondary: #2b5797;
+            --accent: #ffce00;
+            --bg: #f3f4f6;
+            --white: #ffffff;
+            --danger: #e74c3c;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; padding: 0; }
+        .container { max-width: 1000px; margin: 20px auto; background: var(--white); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        header { background: var(--primary); color: white; padding: 25px; text-align: center; position: relative; }
+        .timer-box { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.2); padding: 10px 15px; border-radius: 10px; font-weight: bold; font-size: 1.2em; display: none; }
+
+        .screen { display: none; padding: 40px; animation: fadeIn 0.5s; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Меню */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .menu-card { background: var(--primary); color: white; padding: 30px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; font-weight: bold; border: none; }
+        .menu-card:hover { transform: scale(1.05); background: var(--secondary); }
+
+        /* Батырмалар */
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-next { background: var(--accent); color: #333; }
+        .btn-back { background: #666; color: white; margin-bottom: 20px; }
+        .btn-submit { background: var(--primary); color: white; width: 100%; margin-top: 20px; }
+
+        /* Теория стилі */
+        .theory-content { line-height: 1.8; color: #333; }
+        .theory-image { width: 100%; border-radius: 10px; margin: 20px 0; border: 2px solid #ddd; }
+
+        /* Тапсырмалар стилі */
+        .task-card { background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--primary); }
+        .ai-helper { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 10px; margin-top: 10px; color: #856404; display: none; }
+        .score-display { font-size: 1.5em; font-weight: bold; color: var(--secondary); margin-bottom: 20px; text-align: center; }
+        .descriptor { font-size: 0.85em; color: #666; font-style: italic; margin-bottom: 10px; display: block; }
+        
+        select, input[type="radio"] { cursor: pointer; }
+        .quiz-option { display: block; padding: 10px; background: white; margin: 5px 0; border-radius: 5px; border: 1px solid #ddd; }
+        .correct { background: #d4edda !important; border-color: #28a745 !important; }
+        .wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📊 Excel Мастер: Интерактивті Оқулық</h1>
+        <div id="global-timer" class="timer-box">⏱ Уақыт: <span id="time-val">00</span></div>
+    </header>
+
+    <div id="home" class="screen active">
+        <div class="menu-grid">
+            <button class="menu-card" onclick="showScreen('theory1')">📖 Теория (2 бет)</button>
+            <button class="menu-card" onclick="startMatching()">🧩 Сәйкестендіру ойыны</button>
+            <button class="menu-card" onclick="startQuiz()">🏆 Білімді тексер (Тест)</button>
+            <button class="menu-card" onclick="startTF()">⚖️ Дұрыс-Бұрыс</button>
+        </div>
+    </div>
+
+    <div id="theory1" class="screen">
+        <button class="btn btn-back" onclick="goHome()">← Артқа</button>
+        <h2>Электрондық кесте негіздері (1-бет)</h2>
+        <div class="theory-content">
+            <p><b>Электрондық кесте</b> — деректерді өңдеуге, күрделі есептеулер жүргізуге және диаграммалар құруға арналған қолданбалы бағдарлама. Ең танымал түрі — Microsoft Excel.</p>
+            
+            <ul>
+                <li><b>Жолдар (Rows):</b> Сандармен белгіленеді (1, 2, 3...).</li>
+                <li><b>Бағандар (Columns):</b> Латын әріптерімен белгіленеді (A, B, C...).</li>
+                <li><b>Ұяшық (Cell):</b> Баған мен жолдың қиылысуы (мысалы, A1).</li>
+            </ul>
+        </div>
+        <button class="btn btn-next" style="float: right;" onclick="showScreen('theory2')">Келесі бет →</button>
+    </div>
+
+    <div id="theory2" class="screen">
+        <button class="btn btn-back" onclick="showScreen('theory1')">← Алдыңғы бет</button>
+        <h2>Формулалар мен Функциялар (2-бет)</h2>
+        <div class="theory-content">
+            <p>Excel-дегі кез келген есептеу <b>теңдік (=)</b> таңбасынан басталады. Бұл бағдарламаға ұяшықта формула жазылғанын білдіреді.</p>
+            
+            <p><b>Негізгі функциялар:</b></p>
+            <ul>
+                <li><code>=SUM()</code> — Сандардың қосындысын есептейді.</li>
+                <li><code>=AVERAGE()</code> — Орташа мәнді табады.</li>
+                <li><code>=MAX()</code> / <code>=MIN()</code> — Ең үлкен немесе кіші мәнді табады.</li>
+            </ul>
+            <p><b>Күрделі тапсырма:</b> Егер ұяшыққа <code>=SUM(A1:A5)*0.1</code> деп жазсаңыз, ол сандар қосындысының 10% пайызын автоматты түрде есептеп шығарады.</p>
+        </div>
+        <button class="btn btn-next" style="float: right;" onclick="goHome()">Аяқтау</button>
+    </div>
+
+    <div id="matching" class="screen">
+        <button class="btn btn-back" onclick="stopTask()">← Артқа</button>
+        <div class="score-display">Ұпай: <span id="m-score-val">0</span> / 10</div>
+        <div id="m-list"></div>
+        <button class="btn btn-submit" onclick="checkMatching()">Тексеру</button>
+    </div>
+
+    <div id="quiz" class="screen">
+        <button class="btn btn-back" onclick="stopTask()">← Артқа</button>
+        <div id="q-list"></div>
+        <button id="q-submit" class="btn btn-submit" onclick="checkQuiz()">Тестті аяқтау</button>
+        <div id="q-result" style="margin-top:20px; text-align:center;"></div>
+    </div>
+
+    <div id="truefalse" class="screen">
+        <button class="btn btn-back" onclick="stopTask()">← Артқа</button>
+        <div class="score-display">Ұпай: <span id="tf-score-val">0</span> / 10</div>
+        <div id="tf-list"></div>
+        <button class="btn btn-submit" onclick="checkTF()">Бағалау</button>
+    </div>
+</div>
+
+<script>
+    let timerInterval;
+    let timeLeft = 0;
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function goHome() {
+        clearInterval(timerInterval);
+        document.getElementById('global-timer').style.display = 'none';
+        showScreen('home');
+    }
+
+    function stopTask() {
+        if(confirm("Тапсырманы тоқтатқыңыз келе ме? Уақыт сақталмайды.")) goHome();
+    }
+
+    function startTimer(seconds) {
+        timeLeft = seconds;
+        document.getElementById('global-timer').style.display = 'block';
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('time-val').innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("Уақыт аяқталды!");
+                goHome();
+            }
+        }, 1000);
+    }
+
+    // --- Сәйкестендіру логикасы ---
+    const mData = [
+        {q: "A1", a: "Ұяшық адресі", d: "Дескриптор: Адрестеуді тану - 1 ұпай"},
+        {q: "=", a: "Формула басы", d: "Дескриптор: Формула ережесін білу - 1 ұпай"},
+        {q: "SUM", a: "Қосынды табу", d: "Дескриптор: Функцияны білу - 1 ұпай"},
+        {q: "A1:B10", a: "Диапазон", d: "Дескриптор: Ауқымды анықтау - 1 ұпай"},
+        {q: "$", a: "Абсолютті сілтеме", d: "Дескриптор: Сілтеме түрін білу - 1 ұпай"},
+        {q: "xlsx", a: "Excel форматы", d: "Дескриптор: Файл кеңейтілімін білу - 1 ұпай"},
+        {q: "AVERAGE", a: "Орташа мән", d: "Дескриптор: Статистикалық функция - 1 ұпай"},
+        {q: "Баған", a: "Әріппен белгіленеді", d: "Дескриптор: Кесте құрылымын білу - 1 ұпай"},
+        {q: "Жол", a: "Санмен белгіленеді", d: "Дескриптор: Кесте құрылымын білу - 1 ұпай"},
+        {q: "*", a: "Көбейту таңбасы", d: "Дескриптор: Операторды білу - 1 ұпай"}
+    ];
+
+    function startMatching() {
+        showScreen('matching');
+        startTimer(120);
+        let html = '';
+        mData.forEach((item, i) => {
+            html += `<div class="task-card">
+                <span class="descriptor">${item.d}</span>
+                <b>${item.q}</b> — 
+                <select id="m-select-${i}">
+                    <option value="">Таңдаңыз...</option>
+                    ${mData.map(opt => `<option value="${opt.a}">${opt.a}</option>`).sort().join('')}
+                </select>
+                <div id="m-ai-${i}" class="ai-helper"></div>
+            </div>`;
+        });
+        document.getElementById('m-list').innerHTML = html;
+    }
+
+    function checkMatching() {
+        let score = 0;
+        mData.forEach((item, i) => {
+            let sel = document.getElementById(`m-select-${i}`);
+            let ai = document.getElementById(`m-ai-${i}`);
+            if(sel.value === item.a) {
+                score++;
+                ai.style.display = 'none';
+                sel.style.borderColor = "green";
+            } else {
+                ai.style.display = 'block';
+                ai.innerHTML = `🤖 AI Көмекші: Қате! <b>${item.q}</b> — бұл <b>${item.a}</b>.`;
+                sel.style.borderColor = "red";
+            }
+        });
+        document.getElementById('m-score-val').innerText = score;
+    }
+
+    // --- Тест логикасы ---
+    const qData = [
+        {q: "Excel-де формула қай таңбадан басталады?", o: ["+", "-", "=", "*"], a: 2},
+        {q: "A1:B2 диапазонында неше ұяшық бар?", o: ["2", "4", "6", "8"], a: 1},
+        {q: "Күрделі есептеулер жүргізуге арналған элемент:", o: ["Жол", "Баған", "Формула жолы", "Түс"], a: 2},
+        {q: "MIN(10;20;5) нәтижесі қандай?", o: ["10", "20", "5", "35"], a: 2},
+        {q: "Абсолютті сілтеме белгісі:", o: ["&", "%", "$", "#"], a: 2},
+        {q: "Бағандар қалай белгіленеді?", o: ["1, 2, 3", "A, B, C", "I, II, III", "!, @, #"], a: 1},
+        {q: "AVERAGE(10;20) нәтижесі?", o: ["30", "15", "10", "20"], a: 1},
+        {q: "Кестенің ең кіші элементі:", o: ["Кітап", "Парақ", "Ұяшық", "Баған"], a: 2},
+        {q: "xlsx кеңейтілімі қай бағдарламаға тән?", o: ["Word", "Excel", "Paint", "PowerPoint"], a: 1},
+        {q: "Диапазонның жазылуы:", o: ["A1...B2", "A1-B2", "A1:B2", "A1;B2"], a: 2}
+    ];
+
+    function startQuiz() {
+        showScreen('quiz');
+        startTimer(180);
+        let html = '';
+        qData.forEach((item, i) => {
+            html += `<div class="task-card">
+                <p><b>${i+1}. ${item.q}</b></p>
+                ${item.o.map((opt, j) => `<label class="quiz-option" id="q-l-${i}-${j}"><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`).join('')}
+            </div>`;
+        });
+        document.getElementById('q-list').innerHTML = html;
+        document.getElementById('q-submit').style.display = 'block';
+        document.getElementById('q-result').innerHTML = '';
+    }
+
+    function checkQuiz() {
+        let score = 0;
+        let summary = '<h3>Дұрыс жауаптар:</h3>';
+        qData.forEach((item, i) => {
+            let sel = document.querySelector(`input[name="q${i}"]:checked`);
+            let correctJ = item.a;
+            if(sel && parseInt(sel.value) === correctJ) {
+                score++;
+                document.getElementById(`q-l-${i}-${sel.value}`).classList.add('correct');
+            } else {
+                if(sel) document.getElementById(`q-l-${i}-${sel.value}`).classList.add('wrong');
+                document.getElementById(`q-l-${i}-${correctJ}`).classList.add('correct');
+            }
+            summary += `<p>${i+1}. ${item.q} — <b>${item.o[correctJ]}</b></p>`;
+        });
+        document.getElementById('q-submit').style.display = 'none';
+        document.getElementById('q-result').innerHTML = `<h2>Жиналған ұпай: ${score} / 10</h2>` + summary + `<button class="btn btn-back" onclick="goHome()">Аяқтау</button>`;
+        clearInterval(timerInterval);
+    }
+
+    // --- Дұрыс-Бұрыс логикасы ---
+    const tfData = [
+        {q: "Excel файлы Жұмыс кітабы деп аталады.", a: true},
+        {q: "Бағандар сандармен белгіленеді.", a: false},
+        {q: "SUM функциясы қосындыны табады.", a: true},
+        {q: "Формула + таңбасынан басталады.", a: false},
+        {q: "A1 және $A$1 сілтемелері бірдей жұмыс істейді.", a: false},
+        {q: "MAX функциясы ең үлкен мәнді көрсетеді.", a: true},
+        {q: "Excel-де диаграмма құру мүмкін емес.", a: false},
+        {q: "Парақтардың атын өзгертуге болады.", a: true},
+        {q: "Ұяшық адресі A1 түрінде жазылады.", a: true},
+        {q: "B2:C4 диапазоны 6 ұяшықтан тұрады.", a: true}
+    ];
+
+    function startTF() {
+        showScreen('truefalse');
+        startTimer(120);
+        let html = '';
+        tfData.forEach((item, i) => {
+            html += `<div class="task-card">
+                <p>${i+1}. ${item.q}</p>
+                <input type="radio" name="tf${i}" value="true"> Дұрыс 
+                <input type="radio" name="tf${i}" value="false"> Бұрыс
+                <div id="tf-ai-${i}" class="ai-helper"></div>
+            </div>`;
+        });
+        document.getElementById('tf-list').innerHTML = html;
+    }
+
+    function checkTF() {
+        let score = 0;
+        tfData.forEach((item, i) => {
+            let sel = document.querySelector(`input[name="tf${i}"]:checked`);
+            let ai = document.getElementById(`tf-ai-${i}`);
+            if(sel) {
+                let isCorrect = (sel.value === 'true') === item.a;
+                if(isCorrect) {
+                    score++;
+                    ai.style.display = 'none';
+                } else {
+                    ai.style.display = 'block';
+                    ai.innerHTML = `🤖 AI Көмекші: Қате! Бұл тұжырым <b>${item.a ? 'Дұрыс' : 'Бұрыс'}</b>.`;
+                }
+            }
+        });
+        document.getElementById('tf-score-val').innerText = score;
+    }
+</script>
+
+</body>
+</html>
